@@ -16,6 +16,7 @@ bunsan_use(${PYTHON_LIBRARIES})
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/lib/Header.cpp
+    src/lib/LogReader.cpp
 
     src/python/Header.cpp
 )
