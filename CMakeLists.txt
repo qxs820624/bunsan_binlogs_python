@@ -8,11 +8,7 @@ include(BunsanCommon)
 
 bunsan_use_boost(system filesystem python thread)
 bunsan_use_bunsan(binlogs)
-
-set(Python_ADDITIONAL_VERSIONS "2.7" "2.6" "2.5")
-find_package(PythonLibs)
-include_directories(${PYTHON_INCLUDE_DIRS})
-bunsan_use(${PYTHON_LIBRARIES})
+bunsan_use_python2_libs_minimum(2.6)
 
 bunsan_add_shared_library(${PROJECT_NAME}
     src/lib/Header.cpp
