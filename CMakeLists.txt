@@ -18,6 +18,6 @@ bunsan_add_shared_library(${PROJECT_NAME}
 )
 
 bunsan_install_headers()
-bunsan_install_targets(${PROJECT_NAME})
+bunsan_install_python_module(TARGET ${PROJECT_NAME} MODULE bunsan.binlogs._binlogs)
 
 bunsan_include_tests()
