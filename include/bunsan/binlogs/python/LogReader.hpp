@@ -1,6 +1,7 @@
 #pragma once
 
-#include "bunsan/binlogs/Header.hpp"
+#include "bunsan/binlogs/python/Header.hpp"
+
 #include "bunsan/binlogs/LogReader.hpp"
 
 #include <boost/filesystem/path.hpp>
@@ -23,11 +24,14 @@ public:
 public:
     explicit LogReader(const boost::filesystem::path &path);
 
+    const Header &header() const;
+
     /// \return boost::none on EOF
     boost::optional<Entry> read();
 
 private:
     std::unique_ptr<binlogs::LogReader> logReader_;
+    python::Header header_;
 };
 
 }
