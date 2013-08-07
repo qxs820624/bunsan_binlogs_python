@@ -26,8 +26,11 @@ public:
 
     const Header &header() const;
 
-    /// \return boost::none on EOF
-    boost::optional<Entry> read();
+    LogReader &iter();
+
+    Entry next();
+
+    void close();
 
 private:
     std::unique_ptr<binlogs::LogReader> logReader_;

@@ -2,6 +2,8 @@
 
 #include "bunsan/binlogs/LogFactory.hpp"
 
+#include <boost/python/iterator.hpp>
+
 namespace bunsan {
 namespace binlogs {
 namespace python {
@@ -29,10 +31,15 @@ const Header &LogReader::header() const
     return header_;
 }
 
-boost::optional<LogReader::Entry> LogReader::read()
+LogReader &LogReader::iter()
+{
+    return *this;
+}
+
+LogReader::Entry LogReader::next()
 {
     if (!logReader_) {
-        return boost::none;
+        boost::python::objects::stop_iteration_error();
     }
     Entry entry;
     std::string error;
@@ -40,7 +47,7 @@ boost::optional<LogReader::Entry> LogReader::read()
     if (!msgType) {
         if (logReader_->eof()) {
             logReader_.reset();
-            return boost::none;
+            boost::python::objects::stop_iteration_error();
         }
         throw std::runtime_error(error);
     }
@@ -53,6 +60,16 @@ boost::optional<LogReader::Entry> LogReader::read()
         throw std::runtime_error("Unable to serialize message.");
     }
     return entry;
+}
+
+void LogReader::close()
+{
+    if (logReader_) {
+        std::string error;
+        if (!logReader_->close(&error)) {
+            throw std::runtime_error(error);
+        }
+    }
 }
 
 }
