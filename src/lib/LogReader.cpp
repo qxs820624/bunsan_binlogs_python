@@ -23,8 +23,14 @@ std::unique_ptr<binlogs::LogReader> openReadOnly(const boost::filesystem::path &
 }
 
 LogReader::LogReader(const boost::filesystem::path &path):
-    logReader_(openReadOnly(path)),
+    path_(path),
+    logReader_(openReadOnly(path_)),
     header_(python::Header::get(logReader_->messageTypePool().header())) {}
+
+const boost::filesystem::path &LogReader::path() const
+{
+    return path_;
+}
 
 const Header &LogReader::header() const
 {

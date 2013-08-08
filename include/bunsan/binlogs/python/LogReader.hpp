@@ -24,6 +24,8 @@ public:
 public:
     explicit LogReader(const boost::filesystem::path &path);
 
+    const boost::filesystem::path &path() const;
+
     const Header &header() const;
 
     LogReader &iter();
@@ -33,6 +35,7 @@ public:
     void close();
 
 private:
+    const boost::filesystem::path path_;
     std::unique_ptr<binlogs::LogReader> logReader_;
     python::Header header_;
 };
