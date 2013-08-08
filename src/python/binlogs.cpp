@@ -6,10 +6,7 @@
 using namespace boost::python;
 namespace binlogs = bunsan::binlogs;
 
-namespace
-{
-
-object getStringListRepr(const binlogs::python::StringList &stringList)
+static object getStringListRepr(const binlogs::python::StringList &stringList)
 {
     list l;
     for (const std::string &s: stringList) {
@@ -18,6 +15,9 @@ object getStringListRepr(const binlogs::python::StringList &stringList)
     return str("[") + str(", ").join(l) + str("]");
 }
 
+static object getHeaderRepr(const binlogs::python::Header &header)
+{
+    return str("Header(proto={0!r}, types={1!r})").attr("format")(header.proto, header.types);
 }
 
 BOOST_PYTHON_MODULE(_binlogs)
@@ -28,5 +28,6 @@ BOOST_PYTHON_MODULE(_binlogs)
 
     class_<binlogs::python::Header>("Header", no_init)
         .def_readonly("proto", &binlogs::python::Header::proto)
-        .def_readonly("types", &binlogs::python::Header::types);
+        .def_readonly("types", &binlogs::python::Header::types)
+        .def("__repr__", getHeaderRepr);
 }
