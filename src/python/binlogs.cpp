@@ -36,6 +36,11 @@ static object getPathRepr(const boost::filesystem::path &path)
     return getPathString(path).attr("__repr__")();
 }
 
+static object getLogReaderRepr(const binlogs::python::LogReader &logReader)
+{
+    return str("LogReader(path={0!r})").attr("format")(logReader.path());
+}
+
 BOOST_PYTHON_MODULE(_binlogs)
 {
     class_<boost::filesystem::path>("Path", init<std::string>())
@@ -55,4 +60,18 @@ BOOST_PYTHON_MODULE(_binlogs)
         .def_readonly("type", &binlogs::python::LogReader::Entry::type)
         .def_readonly("data", &binlogs::python::LogReader::Entry::data)
         .def("__repr__", getLogReaderEntryRepr);
+
+    class_<binlogs::python::LogReader, boost::noncopyable>("LogReader", init<boost::filesystem::path>(args("path")))
+        .def(init<std::string>(args("path")))
+        .def("__repr__", getLogReaderRepr)
+        .add_property("path",
+            make_function(&binlogs::python::LogReader::path,
+                return_value_policy<copy_const_reference>()))
+        .add_property("header",
+            make_function(&binlogs::python::LogReader::header,
+                return_value_policy<copy_const_reference>()))
+        .def("__iter__", &binlogs::python::LogReader::iter,
+                return_value_policy<reference_existing_object>())
+        .def("next", &binlogs::python::LogReader::next)
+        .def("close", &binlogs::python::LogReader::close);
 }
