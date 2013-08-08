@@ -2,6 +2,7 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include "bunsan/binlogs/python/Header.hpp"
+#include "bunsan/binlogs/python/LogReader.hpp"
 
 using namespace boost::python;
 namespace binlogs = bunsan::binlogs;
@@ -20,6 +21,11 @@ static object getHeaderRepr(const binlogs::python::Header &header)
     return str("Header(proto={0!r}, types={1!r})").attr("format")(header.proto, header.types);
 }
 
+static object getLogReaderEntryRepr(const binlogs::python::LogReader::Entry &entry)
+{
+    return str("LogReader.Entry(type={0!r}, data={1!r})").attr("format")(entry.type, entry.data);
+}
+
 BOOST_PYTHON_MODULE(_binlogs)
 {
     class_<binlogs::python::StringList>("StringList")
@@ -30,4 +36,9 @@ BOOST_PYTHON_MODULE(_binlogs)
         .def_readonly("proto", &binlogs::python::Header::proto)
         .def_readonly("types", &binlogs::python::Header::types)
         .def("__repr__", getHeaderRepr);
+
+    class_<binlogs::python::LogReader::Entry>("LogReader.Entry")
+        .def_readonly("type", &binlogs::python::LogReader::Entry::type)
+        .def_readonly("data", &binlogs::python::LogReader::Entry::data)
+        .def("__repr__", getLogReaderEntryRepr);
 }
