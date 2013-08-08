@@ -26,8 +26,22 @@ static object getLogReaderEntryRepr(const binlogs::python::LogReader::Entry &ent
     return str("LogReader.Entry(type={0!r}, data={1!r})").attr("format")(entry.type, entry.data);
 }
 
+static object getPathString(const boost::filesystem::path &path)
+{
+    return str(path.string());
+}
+
+static object getPathRepr(const boost::filesystem::path &path)
+{
+    return getPathString(path).attr("__repr__")();
+}
+
 BOOST_PYTHON_MODULE(_binlogs)
 {
+    class_<boost::filesystem::path>("Path", init<std::string>())
+        .def("__str__", getPathString)
+        .def("__repr__", getPathRepr);
+
     class_<binlogs::python::StringList>("StringList")
         .def(vector_indexing_suite<binlogs::python::StringList>())
         .def("__repr__", getStringListRepr);
