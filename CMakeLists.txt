@@ -19,5 +19,6 @@ bunsan_add_shared_library(${PROJECT_NAME}
 
 bunsan_install_headers()
 bunsan_install_python_module_target(TARGET ${PROJECT_NAME} MODULE bunsan.binlogs._binlogs)
+bunsan_install_python_module_init(INIT src/python/__init__.py MODULE bunsan.binlogs)
 
 bunsan_include_tests()
