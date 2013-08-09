@@ -1,5 +1,7 @@
 #include "bunsan/binlogs/python/Header.hpp"
 
+#include <stdexcept>
+
 namespace bunsan {
 namespace binlogs {
 namespace python {

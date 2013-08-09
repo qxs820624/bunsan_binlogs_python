@@ -4,6 +4,8 @@
 
 #include <boost/python/iterator.hpp>
 
+#include <stdexcept>
+
 namespace bunsan {
 namespace binlogs {
 namespace python {
