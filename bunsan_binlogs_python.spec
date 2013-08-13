@@ -14,12 +14,19 @@ Group:      System Environment/Libraries
 Packager:   Aleksey Filippov <sarum9in@yandex-team.ru>
 Distribution:   Red Hat Enterprise Linux
 
-Requires:       python26
 Requires:       bunsan_common_python = %{version}-%{release}
 Requires:       bunsan_binlogs = %{version}-%{release}
 Requires:       protobuf-python >= 2.5.0
 BuildRequires:  bunsan_cmake = %{version}-%{release}
 BuildRequires:  bunsan_binlogs-devel = %{version}-%{release}
+
+%if 0%{?rhel} == 5
+Requires:       python26
+BuildRequires:  python26
+%else
+Requires:       python
+BuildRequires:  python
+%endif
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
