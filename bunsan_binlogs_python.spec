@@ -14,8 +14,6 @@ Group:      System Environment/Libraries
 Packager:   Aleksey Filippov <sarum9in@yandex-team.ru>
 Distribution:   Red Hat Enterprise Linux
 
-BuildArch:  noarch
-
 Requires:       python26
 Requires:       bunsan_common_python = %{version}-%{release}
 Requires:       bunsan_binlogs = %{version}-%{release}
