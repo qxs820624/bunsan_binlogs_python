@@ -272,11 +272,20 @@ def main():
     )
     parser.add_argument('-o', '--destination',
                         required=True, help='Destination directory')
-    parser.add_argument('-l', '--log', required=True, help='Log file')
+    parser.add_argument('-l', '--log', help='Log file')
+    parser.add_argument('-f', '--descriptor_set',
+                        help='File with FileDescriptorSet')
     args = parser.parse_args()
 
-    with LogReader(args.log) as log_reader:
-        proto = log_reader.header.proto
+    if args.log:
+        with LogReader(args.log) as log_reader:
+            proto = log_reader.header.proto
+    elif args.descriptor_set:
+        proto = FileDescriptorSet()
+        with open(args.descriptor_set) as f:
+            proto.ParseFromString(f.read())
+    else:
+        raise ValueError('You should specify one of: LOG, DESCRIPTOR_SET')
 
     extract_source_tree(args.destination, proto)
 
