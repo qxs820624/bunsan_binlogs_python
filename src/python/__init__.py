@@ -32,7 +32,8 @@ class Header(object):
         self._types = value
 
     def __repr__(self):
-        return 'Header(proto={0!r}, types={1!r})'.format(self._proto, self._types)
+        return 'Header(proto={0!r}, types={1!r})'.format(
+            self._proto, self._types)
 
 
 class LogReader(object):
