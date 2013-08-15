@@ -5,7 +5,6 @@ from __future__ import absolute_import
 from google.protobuf.descriptor_pb2 import FileDescriptorSet
 from google.protobuf.descriptor_pool import DescriptorPool
 from google.protobuf.message_factory import MessageFactory
-from google.protobuf.reflection import ParseMessage
 
 from ._binlogs import LogReader as _LogReader
 
