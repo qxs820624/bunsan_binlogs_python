@@ -5,7 +5,6 @@ from __future__ import absolute_import
 from google.protobuf.descriptor_pb2 import FileDescriptorSet
 from google.protobuf.descriptor_pool import DescriptorPool
 from google.protobuf.message_factory import MessageFactory
-from google.protobuf.reflection import ParseMessage
 
 from ._binlogs import LogReader as _LogReader
 
@@ -33,7 +32,8 @@ class Header(object):
         self._types = value
 
     def __repr__(self):
-        return 'Header(proto={0!r}, types={1!r})'.format(self._proto, self._types)
+        return 'Header(proto={0!r}, types={1!r})'.format(
+            self._proto, self._types)
 
 
 class LogReader(object):
