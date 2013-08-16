@@ -36,7 +36,45 @@ class Header(object):
             self._proto, self._types)
 
 
+class LogItem(object):
+
+    def __init__(self, type, value):
+        self._type = type
+        self._value = value
+
+    @property
+    def type(self):
+        """Fully-qualified google.protobuf.Message type name."""
+        return self._type
+
+    @property
+    def value(self):
+        """google.protobuf.Message representing log entry."""
+        return self._value
+
+    def __str__(self):
+        return '[{0}]\n{1}'.format(self._type, self._value)
+
+    def __repr__(self):
+        return 'LogItem(type={0!r}, value={1!r})'.format(
+            self._type, self._value)
+
+
 class LogReader(object):
+    """
+        File-like interface for binary logs.
+
+        >>> with LogReader("path/to/log/file.gz") as log:
+        ...     for item in log.items():
+        ...         print(entry.type)
+        ...         print(entry.value.some.nested.object)
+        ...         print()
+
+        >>> with LogReader("path/to/log/file.gz") as log:
+        ...     for value in log.values():
+        ...         print(value.some.nested.object)
+        ...         print()
+    """
 
     def __init__(self, path):
         self._log_reader = _LogReader(path)
@@ -53,26 +91,61 @@ class LogReader(object):
 
     @property
     def path(self):
+        """Log path."""
         return self._log_reader.path
 
     @property
     def header(self):
+        """Log header."""
         return self._header
 
     def __repr__(self):
         return repr(self._log_reader)
 
-    def __iter__(self):
-        return self
+    def items(self):
+        """Return iterator to log items."""
+        this = self
 
-    def next(self):
+        class Iterator(object):
+
+            def __iter__(self):
+                return self
+
+            def next(self):
+                return this._next()
+
+        return Iterator()
+
+    def values(self):
+        """Return iterator to log values."""
+        this = self
+
+        class Iterator(object):
+
+            def __iter__(self):
+                return self
+
+            def next(self):
+                return this._next().value
+
+        return Iterator()
+
+    def _next(self):
         next_ = self._log_reader.next()
         descriptor = self._pool.FindMessageTypeByName(next_.type)
-        message = self._factory.GetPrototype(descriptor)()
-        message.ParseFromString(next_.data)
-        return message
+        value = self._factory.GetPrototype(descriptor)()
+        value.ParseFromString(next_.data)
+        return LogItem(next_.type, value)
+
+    def read(self):
+        """Return None on EOF."""
+        try:
+            return self._next().value
+        except StopIteration:
+            return None
 
     def close(self):
+        """Closes LogReader. LogReader will take EOF state."""
         self._log_reader.close()
 
     def __enter__(self):
