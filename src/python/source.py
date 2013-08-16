@@ -1,15 +1,21 @@
 #!/usr/bin/python2
 
+"""
+    Functions for google.protobuf source code extraction.
+
+    It is possible to use this module as a script, see main().
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 
 import os
 from os.path import dirname, exists, join
 
-from google.protobuf.descriptor_pb2 import *
+from google.protobuf.descriptor_pb2 import FileDescriptorSet
 
 
-def get_field_type_name(field):
+def _get_field_type_name(field):
     if field.HasField('type_name'):
         return field.type_name
     else:
@@ -36,11 +42,11 @@ def get_field_type_name(field):
         ][field.type]
 
 
-def get_field_label(l):
+def _get_field_label(l):
     return [None, 'optional', 'required', 'repeated'][l]
 
 
-class FileSourceExtractor(object):
+class _FileSourceExtractor(object):
 
     def __init__(self, file_descriptor_proto):
         self._proto = file_descriptor_proto
@@ -117,8 +123,8 @@ class FileSourceExtractor(object):
 
     def _print_field(self, field):
         self._print(
-            get_field_label(field.label),
-            get_field_type_name(field),
+            _get_field_label(field.label),
+            _get_field_type_name(field),
             field.name,
             '=',
             field.number,
@@ -248,34 +254,37 @@ class FileSourceExtractor(object):
 
 
 def extract_source_file(destination, file_descriptor_proto):
+    """Extract file_descriptor_proto's source into destination directory."""
     filename = join(destination, file_descriptor_proto.name)
     directory = dirname(filename)
     if not exists(directory):
         os.makedirs(directory)
     with open(filename, 'w') as out_file:
-        FileSourceExtractor(
+        _FileSourceExtractor(
             file_descriptor_proto=file_descriptor_proto).extract(out_file)
 
 
 def extract_source_tree(destination, file_descriptor_set):
+    """Extract file_descriptor_set's sources into destination directory."""
     for fd in file_descriptor_set.file:
         extract_source_file(destination, fd)
 
 
-def main():
+def main(args=None):
+    """Run CLI."""
     import argparse
 
     from . import LogReader
 
     parser = argparse.ArgumentParser(
-        description="Extract google::protobuf source tree from log file."
+        description="Extract google.protobuf source tree."
     )
     parser.add_argument('-o', '--destination',
                         required=True, help='Destination directory')
     parser.add_argument('-l', '--log', help='Log file')
     parser.add_argument('-f', '--descriptor_set',
                         help='File with FileDescriptorSet')
-    args = parser.parse_args()
+    args = parser.parse_args(args=args)
 
     if args.log:
         with LogReader(args.log) as log_reader:
@@ -292,6 +301,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-__all__ = ['extract_source_tree', 'main', 'NonEmptyRootError']
