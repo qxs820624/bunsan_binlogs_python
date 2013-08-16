@@ -67,6 +67,9 @@ rm -rf %{buildroot}
 %{_prefix}/lib/python2.6/site-packages/bunsan/binlogs/__init__.py
 %{_prefix}/lib/python2.6/site-packages/bunsan/binlogs/__init__.pyc
 %{_prefix}/lib/python2.6/site-packages/bunsan/binlogs/__init__.pyo
+%{_prefix}/lib/python2.6/site-packages/bunsan/binlogs/source.py
+%{_prefix}/lib/python2.6/site-packages/bunsan/binlogs/source.pyc
+%{_prefix}/lib/python2.6/site-packages/bunsan/binlogs/source.pyo
 
 
 %files devel
