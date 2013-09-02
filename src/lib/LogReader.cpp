@@ -3,6 +3,7 @@
 #include "bunsan/binlogs/LogFactory.hpp"
 
 #include <boost/python/iterator.hpp>
+#include <boost/scope_exit.hpp>
 
 #include <stdexcept>
 
@@ -10,23 +11,9 @@ namespace bunsan {
 namespace binlogs {
 namespace python {
 
-namespace {
-
-std::unique_ptr<binlogs::LogReader> openReadOnly(const boost::filesystem::path &path)
-{
-    std::string error;
-    auto logReader = binlogs::openReadOnly(path, &error);
-    if (!logReader) {
-        throw std::runtime_error(error);
-    }
-    return logReader;
-}
-
-}
-
 LogReader::LogReader(const boost::filesystem::path &path):
     path_(path),
-    logReader_(openReadOnly(path_)),
+    logReader_(binlogs::openReadOnly(path)),
     header_(python::Header::get(logReader_->messageTypePool().header())) {}
 
 const boost::filesystem::path &LogReader::path() const
@@ -50,20 +37,15 @@ LogReader::Entry LogReader::next()
         boost::python::objects::stop_iteration_error();
     }
     Entry entry;
-    std::string error;
-    const MessageType *const msgType = logReader_->nextMessageType(&error);
+    const MessageType *const msgType = logReader_->nextMessageType();
     if (!msgType) {
-        if (logReader_->eof()) {
-            logReader_.reset();
-            boost::python::objects::stop_iteration_error();
-        }
-        throw std::runtime_error(error);
+        BOOST_ASSERT(logReader_->eof());
+        logReader_.reset();
+        boost::python::objects::stop_iteration_error();
     }
     entry.type = msgType->typeName();
     const auto msg = msgType->newMessage();
-    if (!logReader_->read(msg, &error)) {
-        throw std::runtime_error(error);
-    }
+    logReader_->read(msg);
     if (!msg->SerializeToString(&entry.data)) {
         throw std::runtime_error("Unable to serialize message.");
     }
@@ -73,10 +55,11 @@ LogReader::Entry LogReader::next()
 void LogReader::close()
 {
     if (logReader_) {
-        std::string error;
-        if (!logReader_->close(&error)) {
-            throw std::runtime_error(error);
-        }
+        BOOST_SCOPE_EXIT_ALL(this)
+        {
+            logReader_.reset();
+        };
+        logReader_->close();
     }
 }
 
